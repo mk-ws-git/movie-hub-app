@@ -4,6 +4,8 @@ import os
 from flask import Flask
 from models import db, Movie
 from data_manager import DataManager
+from omdb import fetch_movie_from_omdb
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
@@ -52,7 +54,23 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
 # App Routes
 @app.route('/')
 def home():
-    return "Welcome to movie hub app!"
+    return "movie hub"
+
+@app.route('/users', methods=['POST'])
+def get_users():
+    users = dm.get_users()
+    return str(users)  # Temporarily returning users as a string
+
+@app.route('/users/<int:user_id>/movies', methods=['GET'])
+def list_movies(user_id):
+    movies = dm.get_movies(user_id)
+    return str(movies) # Temporarily returning movies as a string
+
+
+@app.route('/users/<int:user_id>/movies', methods=['POST'])
+def create_movie(user_id):
+
+
 
 if __name__ == '__main__':
     with app.app_context():
