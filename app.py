@@ -66,9 +66,12 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
 
 # App Routes
 
-@app.route("/")
-def home():
-    return "movie hub"
+
+@app.route('/')
+def index():
+    users = dm.get_users()
+    return render_template('index.html', users=users)
+
 
 # List all users
 @app.route('/users', methods=["GET"])
@@ -80,16 +83,19 @@ def list_users():
 
     return "<br>".join([f"{u.id}: {u.name}" for u in users])
 
+
 # Create a user
 @app.route("/users", methods=["POST"])
-def add_user():
+def create_user():
     name = request.form.get("name", "").strip()
 
     if not name:
         return "User name required", 400
 
     dm.create_user(name)
-    return f"User '{name}' created"
+    print(f"User '{name}' created")
+    return redirect(url_for("index"))
+
 
 # List movies for a user
 @app.route("/users/<int:user_id>/movies", methods=["GET"])
@@ -100,6 +106,7 @@ def list_movies(user_id):
         return "No movies for this user."
 
     return "<br>".join([f"{m.id}: {m.title} ({m.year})" for m in movies])
+
 
 # Add movie via OMDb
 @app.route("/users/<int:user_id>/movies", methods=["POST"])
@@ -119,7 +126,6 @@ def create_movie(user_id):
     db.session.commit()
 
     return f"Movie '{movie.title}' added to user {user_id}"
-
 
 
 if __name__ == '__main__':
