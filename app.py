@@ -38,7 +38,7 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
     if data.get("Runtime") and data["Runtime"] != "N/A":
         runtime = int(data["Runtime"].split()[0])
 
-    rating = 0
+    rating = 0.0
     if data.get("imdbRating") and data["imdbRating"] != "N/A":
         rating = float(data["imdbRating"])
 
@@ -54,7 +54,7 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
         country=data.get["Country", ""],
         plot=data.get["Plot", ""],
         runtime=runtime,
-        imdb_rating=float(rating),
+        imdb_rating=rating,
         poster_url=data.get("Poster", ""),
         imdb_url=imdb_url,
         imdb_id=imdb_id,
@@ -73,8 +73,12 @@ def home():
 # List all users
 @app.route('/users', methods=["GET"])
 def list_users():
-    users = data_manager.get_users()
-    return str(users) # temporarily returning a string
+    users = dm.get_users()
+
+    if not users:
+        return "No users yet."
+
+    return "<br>".join([f"{u.id}: {u.name}" for u in users])
 
 # Create a user
 @app.route("/users", methods=["POST"])
