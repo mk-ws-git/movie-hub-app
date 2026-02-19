@@ -1,49 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
 {% extends "base.html" %}
 
 {% block content %}
+
 <h1>Movies for {{ user.name }}</h1>
 
+<!-- Add Movie -->
 <form action="{{ url_for('create_movie', user_id=user.id) }}" method="post">
-    <input type="text" name="title" placeholder="Movie title" required>
-    <button type="submit">Add Movie</button>
+  <input type="text" name="title" placeholder="Movie title (e.g., Alien)" required>
+  <button type="submit">Add Movie</button>
 </form>
 
-<ul>
-    {% for movie in movies %}
-    <li>
-        <strong>{{ movie.title }}</strong> ({{ movie.year }})
+<hr>
+
+<!-- Movie List -->
+<ul class="movie-list">
+  {% for movie in movies %}
+    <li class="movie-entry">
+      <div>
+        <strong>{{ movie.title }}</strong>
+        {% if movie.year %} ({{ movie.year }}){% endif %}
 
         {% if movie.imdb_url %}
-            - <a href="{{ movie.imdb_url }}" target="_blank">IMDb</a>
+          - <a href="{{ movie.imdb_url }}" target="_blank" rel="noopener noreferrer">IMDb</a>
         {% endif %}
+      </div>
 
-        <!-- Update title -->
-        <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
-              method="post" style="display:inline;">
-            <input type="text" name="new_title" placeholder="New title" required>
-            <button type="submit">Update</button>
-        </form>
+      <!-- Update Movie Title -->
+      <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+            method="post"
+            style="display:inline-block; margin-top:8px;">
+        <input type="text" name="new_title" placeholder="New title" required>
+        <button type="submit">Update</button>
+      </form>
 
-        <!-- Delete -->
-        <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
-              method="post" style="display:inline;">
-            <button type="submit">Delete</button>
-        </form>
+      <!-- Delete Movie -->
+      <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
+            method="post"
+            style="display:inline-block; margin-top:8px;">
+        <button type="submit">Delete</button>
+      </form>
     </li>
-    {% endfor %}
+  {% else %}
+    <li>No movies yet. Add one above.</li>
+  {% endfor %}
 </ul>
 
-<p><a href="{{ url_for('index') }}">Back to users</a></p>
+<p><a href="{{ url_for('index') }}">← Back to users</a></p>
+
 {% endblock %}
-
-
-</body>
-</html>

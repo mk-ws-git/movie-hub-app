@@ -1,7 +1,7 @@
 import requests
 import os
 
-from models import db, Movie
+from models import db, User, Movie
 from data_manager import DataManager
 from flask import Flask, render_template, request, redirect, url_for
 
@@ -66,7 +66,6 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
 
 # App Routes
 
-
 @app.route('/')
 def index():
     users = dm.get_users()
@@ -100,12 +99,9 @@ def create_user():
 # List movies for a user
 @app.route("/users/<int:user_id>/movies", methods=["GET"])
 def list_movies(user_id):
+    user = User.query.get_or_404(user_id)
     movies = dm.get_movies(user_id)
-
-    if not movies:
-        return "No movies for this user."
-
-    return "<br>".join([f"{m.id}: {m.title} ({m.year})" for m in movies])
+    return render_template("movies.html", user=user, movies=movies)
 
 
 # Add movie via OMDb
@@ -114,18 +110,37 @@ def create_movie(user_id):
     title = request.form.get("title", "").strip()
 
     if not title:
-        return "Movie title required", 400
+        return redirect(url_for("list_movies", user_id=user_id))
 
     movie = fetch_movie_from_omdb(title)
 
     if movie is None:
-        return "Movie not found in OMDb", 404
+        return redirect(url_for("list_movies", user_id=user_id))
 
     movie.user_id = user_id
     db.session.add(movie)
     db.session.commit()
 
-    return f"Movie '{movie.title}' added to user {user_id}"
+    print(f"Movie '{movie.title}' added to user {user_id}")
+    return redirect(url_for("list_movies", user_id=user_id))
+
+
+# Update movie title
+@app.route("/users/<int:user_id>/movies/<int:movie_id>/update", methods=["POST"])
+def update_movie(user_id, movie_id):
+    new_title = request.form.get("new_title", "").strip()
+    if not new_title:
+        return redirect(url_for("list_movies", user_id=user_id))
+
+    dm.update_movie(movie_id, new_title)
+    return redirect(url_for("list_movies", user_id=user_id))
+
+
+# Delete movies for a user
+@app.route("/users/<int:user_id>/movies/<int:movie_id>/delete", methods=["POST"])
+def delete_movie(user_id, movie_id):
+    dm.delete_movie(movie_id)
+    return redirect(url_for("list_movies", user_id=user_id))
 
 
 if __name__ == '__main__':
