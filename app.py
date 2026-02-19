@@ -34,6 +34,13 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
         return None
 
     # Parse movie data and create Movie instance
+    year_str = (data.get("Year") or "").strip()
+
+    # OMDb sometimes returns "1997" or "1997–" (series), so extract the first 4 digits
+    year = 0
+    if len(year_str) >= 4 and year_str[:4].isdigit():
+        year = int(year_str[:4])
+
     runtime = 0
     if data.get("Runtime") and data["Runtime"] != "N/A":
         runtime = int(data["Runtime"].split()[0])
@@ -46,13 +53,13 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
     imdb_url = f"https://www.imdb.com/title/{imdb_id}/" if imdb_id else ""
 
     movie = Movie(
-        title=data.get["Title", ""],
-        genre=data.get["Genre", ""],
-        year=int(data.get["Year"]) if data.get("Year", "").isdigit() else 0,
-        director=data.get["Director", ""],
-        actors = data.get["Actors", ""],
-        country=data.get["Country", ""],
-        plot=data.get["Plot", ""],
+        title=data.get("Title", ""),
+        genre=data.get("Genre", ""),
+        year=year,
+        director = data.get("Director", ""),
+        actors = data.get("Actors", ""),
+        country = data.get("Country", ""),
+        plot = data.get("Plot", ""),
         runtime=runtime,
         imdb_rating=rating,
         poster_url=data.get("Poster", ""),
