@@ -100,6 +100,10 @@ def create_user():
         flash("User name is required.", "error")
         return redirect(url_for("index"))
 
+    if dm.user_exists(name):
+        flash("That user name already exists. Enter another user name.", "error")
+        return redirect(url_for("index"))
+
     dm.create_user(name)
     flash(f"User '{name}' created.", "success")
     return redirect(url_for("index"))
@@ -133,14 +137,16 @@ def create_movie(user_id):
 
     movie = fetch_movie_from_omdb(title)
     if movie is None:
-        flash("Movie not found. Enter another title.", "error")
+        flash("Movie title is required.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
+    if dm.movie_exists_for_user(user_id, movie.imdb_id):
+        flash("That movie is already in this user’s list.", "warning")
         return redirect(url_for("list_movies", user_id=user_id))
 
     movie.user_id = user_id
-    db.session.add(movie)
-    db.session.commit()
-
-    print(f"Movie '{movie.title}' added to user {user_id}")
+    dm.add_movie(movie)
+    flash(f"Added '{movie.title}'.", "success")
     return redirect(url_for("list_movies", user_id=user_id))
 
 
@@ -154,16 +160,11 @@ def update_movie(user_id, movie_id):
 
     new_title = request.form.get("new_title", "").strip()
     if not new_title:
-        flash("New title is required.", "error")
+        flash("New title is required. Enter new movie title.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
-    movie = Movie.query.get(movie_id)
-    if not movie or movie.user_id != user_id:
-        flash("Movie not found for this user.", "error")
-        return redirect(url_for("list_movies", user_id=user_id))
-
-    movie = dm.get_movie(movie_id)
-    if not movie or movie.user_id != user_id:
+    movie = dm.get_movie_for_user(user_id, movie_id)
+    if not movie:
         flash("Movie not found for this user.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
@@ -180,8 +181,8 @@ def delete_movie(user_id, movie_id):
         flash("User not found.", "error")
         return redirect(url_for("index"))
 
-    movie = Movie.query.get(movie_id)
-    if not movie or movie.user_id != user_id:
+    movie = dm.get_movie_for_user(user_id, movie_id)
+    if not movie:
         flash("Movie not found for this user.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
