@@ -3,9 +3,10 @@ import os
 
 from models import db, User, Movie
 from data_manager import DataManager
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "dev")
 
 # Configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -96,32 +97,43 @@ def create_user():
     name = request.form.get("name", "").strip()
 
     if not name:
-        return "User name required", 400
+        flash("User name is required.", "error")
+        return redirect(url_for("index"))
 
     dm.create_user(name)
-    print(f"User '{name}' created")
+    flash(f"User '{name}' created.", "success")
     return redirect(url_for("index"))
 
 
 # List movies for a user
 @app.route("/users/<int:user_id>/movies", methods=["GET"])
 def list_movies(user_id):
-    user = User.query.get_or_404(user_id)
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("index"))
+
     movies = dm.get_movies(user_id)
     return render_template("movies.html", user=user, movies=movies)
 
 
-# Add movie via OMDb
+# Add movie for a user via OMDb
 @app.route("/users/<int:user_id>/movies", methods=["POST"])
 def create_movie(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("index"))
+
     title = request.form.get("title", "").strip()
 
     if not title:
+        flash("Movie not found. Enter another title.")
         return redirect(url_for("list_movies", user_id=user_id))
 
     movie = fetch_movie_from_omdb(title)
-
     if movie is None:
+        flash("Movie not found. Enter another title.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
     movie.user_id = user_id
@@ -135,18 +147,46 @@ def create_movie(user_id):
 # Update movie title
 @app.route("/users/<int:user_id>/movies/<int:movie_id>/update", methods=["POST"])
 def update_movie(user_id, movie_id):
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("index"))
+
     new_title = request.form.get("new_title", "").strip()
     if not new_title:
+        flash("New title is required.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
+    movie = Movie.query.get(movie_id)
+    if not movie or movie.user_id != user_id:
+        flash("Movie not found for this user.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
+    movie = dm.get_movie(movie_id)
+    if not movie or movie.user_id != user_id:
+        flash("Movie not found for this user.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
     dm.update_movie(movie_id, new_title)
+    flash("Movie title updated.", "success")
     return redirect(url_for("list_movies", user_id=user_id))
 
 
 # Delete movies for a user
 @app.route("/users/<int:user_id>/movies/<int:movie_id>/delete", methods=["POST"])
 def delete_movie(user_id, movie_id):
-    dm.delete_movie(movie_id)
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("index"))
+
+    movie = Movie.query.get(movie_id)
+    if not movie or movie.user_id != user_id:
+        flash("Movie not found for this user.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
+    ok = dm.delete_movie(movie_id)
+    flash("Movie deleted." if ok else "Movie not found.", "success" if ok else "error")
     return redirect(url_for("list_movies", user_id=user_id))
 
 
