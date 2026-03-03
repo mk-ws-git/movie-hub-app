@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}mov.io{% endblock %}
+{% block body_class %}home-body{% endblock %}
+{% block main_class %}home-main{% endblock %}
+
+{% block content %}
+  <section class="home-hero">
+    <div class="home-overlay">
+      <h1 class="home-title">mov.io</h1>
+      <p class="home-subtitle">organize and explore your favorite movies</p>
+
+      <div class="home-actions">
+        <a href="{{ url_for('list_users') }}" class="btn btn-light btn-lg">SELECT A USER</a>
+        <a href="{{ url_for('list_users') }}#create-user" class="btn btn-outline-light btn-lg">CREATE A USER</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}
