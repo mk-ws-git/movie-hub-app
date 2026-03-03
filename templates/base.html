@@ -1,47 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}moviehub{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}mov.io{% endblock %}</title>
 
-    <!-- Main Stylesheet -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
-    <!-- Top Navigation Bar -->
-    <header class="topbar">
-        <div class="topbar-inner">
-            <a href="{{ url_for('index') }}" class="brand">
-                mov.io
-            </a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="{{ url_for('home') }}" class="brand">mov.io</a>
+      <nav class="nav">
+        <a href="{{ url_for('list_users') }}" class="nav-link">Users</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="{% block main_class %}container{% endblock %}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
         </div>
-    </header>
+      {% endif %}
+    {% endwith %}
 
-    <!-- Main Page Container -->
-    <main class="container">
-
-        <!-- Flash Messages Container -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-container">
-                    {% for category, message in messages %}
-                        <div class="flash flash-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
-        <!-- Page Content -->
-        {% block content %}
-        {% endblock %}
-    </main>
+    {% block content %}{% endblock %}
+  </main>
 
 </body>
 </html>

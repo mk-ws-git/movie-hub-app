@@ -102,15 +102,16 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
     return movie
 
 
-# App Routes
+""" APP ROUTES """
 
 @app.route('/')
-def index():
+def home():
+    return render_template('home.html')
+
+@app.route('/users', methods=["GET"])
+def list_users():
     users = dm.get_users()
-    return render_template('index.html', users=users)
-
-
-""" APP ROUTES """
+    return render_template("users.html", users=users)
 
 # Create a user
 @app.route("/users", methods=["POST"])
