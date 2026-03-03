@@ -24,12 +24,18 @@ dm = DataManager()
 def fetch_movie_from_omdb(title: str) -> Movie | None:
     if not OMDB_API_KEY:
         raise RuntimeError("OMDB_API_KEY environment variable is not set.")
-    response = requests.get(
+
+    # OMDB request with error handling
+    try:
+        response = requests.get(
         "https://www.omdbapi.com/",
         params={"t": title, "apikey": OMDB_API_KEY},
         timeout=10,
     )
-    data = response.json()
+        response.raise_for_status()
+        data = response.json()
+    except requests.RequestException:
+        return None
 
     if data.get("Response") == "False":
         return None
