@@ -54,3 +54,55 @@ body {
     background-color: #fef3c7;
     color: #78350f;
 }
+
+/* Global spacing */
+main.container {
+  margin-top: 70px;
+  margin-bottom: 70px;
+}
+
+/* H1 styling across all pages */
+h1 {
+  margin-top: 70px;
+  font-weight: 700;
+  color: #0000ff;
+}
+
+/* Body content container */
+.content-card {
+  max-width: 800px;
+  margin: 70px auto 0 auto;
+  padding: 40px;
+  background: rgba(173, 216, 255, 0.25); /* light blue transparent */
+  border-radius: 18px;
+}
+
+/* Section divider */
+.section-divider {
+  margin: 25px 0;
+  border-top: 1px solid rgba(0,0,0,0.15);
+}
+
+/* Two-column header row */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+/* Rounded inputs */
+input[type="text"] {
+  border-radius: 30px;
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+}
+
+/* Rounded buttons */
+button,
+.btn {
+  border-radius: 30px !important;
+  padding: 8px 18px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
