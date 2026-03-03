@@ -49,7 +49,7 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
     # OMDB request with error handling
     try:
         response = requests.get(
-        "https://www.omdbapi.com/",
+            "https://www.omdbapi.com/",
             params={"t": title, "apikey": OMDB_API_KEY},
             timeout=10,
     )
@@ -110,16 +110,7 @@ def index():
     return render_template('index.html', users=users)
 
 
-# List all users
-@app.route('/users', methods=["GET"])
-def list_users():
-    users = dm.get_users()
-
-    if not users:
-        return "No users yet."
-
-    return "<br>".join([f"{u.id}: {u.name}" for u in users])
-
+""" APP ROUTES """
 
 # Create a user
 @app.route("/users", methods=["POST"])
@@ -136,7 +127,7 @@ def create_user():
         flash("That user name already exists. Enter another user name.", "error")
         return redirect(url_for("index"))
 
-    dm.create_user(name):
+    dm.create_user(name)
     app.logger.info("User created name=%r", name)
     flash(f"User '{name}' created.", "success")
     return redirect(url_for("index"))
