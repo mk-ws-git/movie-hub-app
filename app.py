@@ -4,6 +4,7 @@ import os
 from models import db, User, Movie
 from data_manager import DataManager
 from flask import Flask, render_template, request, redirect, url_for, flash
+from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev")
@@ -29,8 +30,8 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
     try:
         response = requests.get(
         "https://www.omdbapi.com/",
-        params={"t": title, "apikey": OMDB_API_KEY},
-        timeout=10,
+            params={"t": title, "apikey": OMDB_API_KEY},
+            timeout=10,
     )
         response.raise_for_status()
         data = response.json()
@@ -136,14 +137,13 @@ def create_movie(user_id):
         return redirect(url_for("index"))
 
     title = request.form.get("title", "").strip()
-
     if not title:
-        flash("Movie not found. Enter another title.")
+        flash("Movie title is required. Enter a movie title.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
     movie = fetch_movie_from_omdb(title)
     if movie is None:
-        flash("Movie title is required.", "error")
+        flash("Movie title not found or OMDB unavailable. Enter another title.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
     if dm.movie_exists_for_user(user_id, movie.imdb_id):
@@ -151,7 +151,14 @@ def create_movie(user_id):
         return redirect(url_for("list_movies", user_id=user_id))
 
     movie.user_id = user_id
-    dm.add_movie(movie)
+
+    try:
+        dm.add_movie(movie)
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash("Database error occurred.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
     flash(f"Added '{movie.title}'.", "success")
     return redirect(url_for("list_movies", user_id=user_id))
 
