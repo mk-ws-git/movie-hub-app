@@ -156,7 +156,7 @@ def create_movie(user_id):
         dm.add_movie(movie)
     except SQLAlchemyError:
         db.session.rollback()
-        flash("Database error occurred.", "error")
+        flash("Database error occurred while adding the movie.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
     flash(f"Added '{movie.title}'.", "success")
@@ -181,7 +181,13 @@ def update_movie(user_id, movie_id):
         flash("Movie not found for this user.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
-    dm.update_movie(movie_id, new_title)
+    try:
+        dm.update_movie(movie_id, new_title)
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash("Database error occurred while updating the movie.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
     flash("Movie title updated.", "success")
     return redirect(url_for("list_movies", user_id=user_id))
 
@@ -199,7 +205,13 @@ def delete_movie(user_id, movie_id):
         flash("Movie not found for this user.", "error")
         return redirect(url_for("list_movies", user_id=user_id))
 
-    ok = dm.delete_movie(movie_id)
+    try:
+        ok = dm.delete_movie(movie_id)
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash("Database error occurred while deleting movie.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
     flash("Movie deleted." if ok else "Movie not found.", "success" if ok else "error")
     return redirect(url_for("list_movies", user_id=user_id))
 
