@@ -5,29 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}moviehub{% endblock %}</title>
 
+    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <header class="header">
-        <h1>moviehub</h1>
-        <nav class="nav">
-            <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('list_users') }}">Users</a>
-        </nav>
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a href="{{ url_for('index') }}" class="logo">
+                Movie Hub
+            </a>
+        </div>
     </header>
 
+    <!-- Main Page Container -->
     <main class="container">
+
+        <!-- Flash Messages Container -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <ul class="flash-list">
+                <div class="flash-container">
                     {% for category, message in messages %}
-                        <li class="flash {{ category }}">{{ message }}</li>
+                        <div class="flash flash-{{ category }}">
+                            {{ message }}
+                        </div>
                     {% endfor %}
-                </ul>
+                </div>
             {% endif %}
         {% endwith %}
+
+        <!-- Page Content -->
         {% block content %}
         {% endblock %}
     </main>
