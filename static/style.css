@@ -1,0 +1,56 @@
+/* Reset some default spacing */
+body {
+    margin: 0;
+    font-family: Roboto, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* Top navigation bar */
+.topbar {
+    background-image: url("/static/movio-header.svg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    padding: 60px 20px;
+}
+
+.topbar .brand {
+    color: white;
+    text-decoration: none;
+    font-size: 60px;
+    font-weight: bold;
+}
+
+/* Main content container */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Flash messages */
+.flash-container {
+    margin-bottom: 20px;
+}
+
+.flash {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.flash-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.flash-error {
+    background-color: #fee2e2;
+    color: #7f1d1d;
+}
+
+.flash-warning {
+    background-color: #fef3c7;
+    color: #78350f;
+}
