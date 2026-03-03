@@ -2,49 +2,93 @@
 
 {% block content %}
 
-<h1>Movies for {{ user.name }}</h1>
+<h1>welcome back to mov.io, {{ user.name }}.</h1>
 
-<!-- Add Movie -->
-<form action="{{ url_for('create_movie', user_id=user.id) }}" method="post">
-  <input type="text" name="title" placeholder="Movie title (e.g., Alien)" required>
-  <button type="submit">Add Movie</button>
-</form>
+<div class="content-card">
+    <h2>organize and explore your favourite movies</h2>
 
-<hr>
+  <div class="section-divider"></div>
 
-<!-- Movie List -->
-<ul class="movie-list">
-  {% for movie in movies %}
-    <li class="movie-entry">
-      <div>
-        <strong>{{ movie.title }}</strong>
-        {% if movie.year %} ({{ movie.year }}){% endif %}
+  <!-- Header Row -->
+  <div class="section-header">
+    <h4 class="m-0">Your movie list:</h4>
 
-        {% if movie.imdb_url %}
-          - <a href="{{ movie.imdb_url }}" target="_blank" rel="noopener noreferrer">IMDb</a>
-        {% endif %}
-      </div>
+    <button type="button"
+            class="btn btn-primary"
+            onclick="document.getElementById('add-movie-form').scrollIntoView({behavior: 'smooth'})">
+      ADD MOVIE
+    </button>
+  </div>
 
-      <!-- Update Movie Title -->
-      <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
-            method="post"
-            style="display:inline-block; margin-top:8px;">
-        <input type="text" name="new_title" placeholder="New title" required>
-        <button type="submit">Update</button>
-      </form>
+  <!-- Add Movie Form -->
+  <form id="add-movie-form"
+        action="{{ url_for('create_movie', user_id=user.id) }}"
+        method="post"
+        class="mb-4">
 
-      <!-- Delete Movie -->
-      <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
-            method="post"
-            style="display:inline-block; margin-top:8px;">
-        <button type="submit">Delete</button>
-      </form>
-    </li>
-  {% else %}
-    <li>No movies yet. Add one above.</li>
-  {% endfor %}
-</ul>
+    <div class="d-flex gap-2">
+      <input type="text"
+             name="title"
+             placeholder="Movie title (e.g., Alien)"
+             class="form-control"
+             required>
 
-<p><a href="{{ url_for('index') }}">← Back to users</a></p>
+      <button type="submit" class="btn btn-dark">
+        ADD
+      </button>
+    </div>
+  </form>
+
+  <div class="section-divider"></div>
+
+  <!-- Movie List -->
+  <ul class="list-unstyled">
+    {% for movie in movies %}
+      <li class="mb-4">
+
+        <div class="mb-2">
+          <strong>{{ movie.title }}</strong>
+          {% if movie.year %} ({{ movie.year }}){% endif %}
+          {% if movie.imdb_url %}
+            - <a href="{{ movie.imdb_url }}" target="_blank">IMDb</a>
+          {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+          <!-- Update -->
+          <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+                method="post"
+                class="d-flex gap-2">
+            <input type="text"
+                   name="new_title"
+                   placeholder="New title"
+                   required>
+            <button type="submit" class="btn btn-outline-primary">
+              UPDATE
+            </button>
+          </form>
+
+          <!-- Delete -->
+          <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
+                method="post">
+            <button type="submit" class="btn btn-outline-danger">
+              DELETE
+            </button>
+          </form>
+
+        </div>
+
+      </li>
+    {% else %}
+      <li>No movies yet. Add one above.</li>
+    {% endfor %}
+  </ul>
+
+  <div class="mt-4">
+    <a href="{{ url_for('home') }}">← Back to home</a>
+  </div>
+
+</div>
 
 {% endblock %}
