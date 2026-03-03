@@ -1,26 +1,42 @@
 {% extends "base.html" %}
+{% block title %}Users – mov.io{% endblock %}
 
 {% block content %}
 
-<h1>Users</h1>
+<h1 class="mb-4">Users</h1>
 
-<ul class="user-list">
-    {% for user in users %}
-        <li class="user-entry">
-            <a href="{{ url_for('list_movies', user_id=user.id) }}">
-                {{ user.name }}
-            </a>
-        </li>
-    {% endfor %}
+<!-- Users List -->
+<ul class="list-group mb-5">
+  {% for user in users %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      {{ user.name }}
+      <a href="{{ url_for('list_movies', user_id=user.id) }}" class="btn btn-sm btn-primary">
+        View Movies
+      </a>
+    </li>
+  {% endfor %}
 </ul>
 
-<hr>
 
-<h2>Add New User</h2>
+<!-- Create User Section -->
+<div id="create-user" class="card p-4 shadow-sm">
+  <h2 class="mb-3">Create a New User</h2>
 
-<form action="{{ url_for('create_user') }}" method="post">
-    <input type="text" name="name" placeholder="Enter user name" required>
-    <button type="submit">Add User</button>
-</form>
+  <form action="{{ url_for('create_user') }}" method="post">
+    <div class="mb-3">
+      <input
+        type="text"
+        name="name"
+        class="form-control"
+        placeholder="Enter user name"
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn btn-dark">
+      Create User
+    </button>
+  </form>
+</div>
 
 {% endblock %}
