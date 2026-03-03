@@ -1,8 +1,49 @@
-/* Reset some default spacing */
+/* =========================
+   mov.io Design System
+   ========================= */
+:root {
+  --blue: #0000ff;
+  --text: #0b0b12;
+  --muted: rgba(11, 11, 18, 0.65);
+  --border: rgba(11, 11, 18, 0.12);
+
+  --card-bg: rgba(173, 216, 255, 0.25);
+  --card-bg-strong: rgba(173, 216, 255, 0.35);
+
+  --radius-sm: 12px;
+  --radius-lg: 18px;
+
+  --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
+  --shadow-md: 0 12px 30px rgba(0,0,0,0.10);
+
+  --gap-1: 10px;
+  --gap-2: 14px;
+  --gap-3: 20px;
+
+  --pad-1: 14px;
+  --pad-2: 20px;
+  --pad-3: 32px;
+}
+
+
+/* Global basics */
 body {
-    margin: 0;
-    font-family: Roboto, sans-serif;
-    background-color: #f5f5f5;
+  margin: 0;
+  font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: var(--text);
+}
+
+main.container {
+  margin-top: 70px;
+  margin-bottom: 70px;
+}
+
+/* Typography */
+h1 {
+  margin-top: 70px;
+  font-weight: 800;
+  color: var(--blue);
 }
 
 /* Top navigation bar */
@@ -61,7 +102,7 @@ main.container {
   margin-bottom: 70px;
 }
 
-/* H1 styling across all pages */
+/* Typography */
 h1 {
   margin-top: 70px;
   font-weight: 700;
@@ -73,14 +114,15 @@ h1 {
   max-width: 800px;
   margin: 70px auto 0 auto;
   padding: 40px;
-  background: rgba(173, 216, 255, 0.25); /* light blue transparent */
-  border-radius: 18px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
 }
 
-/* Section divider */
 .section-divider {
   margin: 25px 0;
-  border-top: 1px solid rgba(0,0,0,0.15);
+  border-top: 1px solid var(--border);
 }
 
 /* Two-column header row */
@@ -91,18 +133,31 @@ h1 {
   margin-bottom: 25px;
 }
 
-/* Rounded inputs */
-input[type="text"] {
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
   border-radius: 30px;
   padding: 10px 16px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.85);
+  outline: none;
 }
 
-/* Rounded buttons */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(0,0,255,0.35);
+  box-shadow: 0 0 0 4px rgba(0,0,255,0.10);
+}
+
+/* All buttons (including Bootstrap .btn) */
 button,
 .btn {
   border-radius: 30px !important;
-  padding: 8px 18px;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
