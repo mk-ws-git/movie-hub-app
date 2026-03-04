@@ -4,16 +4,72 @@
 {% block body_class %}home-body{% endblock %}
 {% block main_class %}home-main{% endblock %}
 
-{% block content %}
-  <section class="home-hero">
-    <div class="home-overlay">
-      <h1 class="home-title">mov.io</h1>
-      <p class="home-subtitle">organize and explore your favorite movies</p>
+{% block header %}{% endblock %}
 
-      <div class="home-actions">
-        <a href="{{ url_for('list_users') }}" class="btn btn-light btn-lg">SELECT A USER</a>
-        <a href="{{ url_for('list_users') }}#create-user" class="btn btn-outline-light btn-lg">CREATE A USER</a>
+{% block content %}
+<section class="home-hero">
+
+  <!-- ── Logo ── -->
+  <div class="home-logo-wrap">
+    <div class="home-logo">
+      <span class="logo-mov">mov</span><span class="logo-dot">.</span><span class="logo-io">io</span>
+    </div>
+    <p class="home-tagline">organize and explore your favorite movies</p>
+  </div>
+
+  <!-- ── User Profiles ── -->
+  <div class="home-card">
+    <span class="user-section-label">Who's watching?</span>
+
+    <div class="user-grid-wrap">
+      <div class="user-grid">
+
+        {% for u in user_cards %}
+        <a class="user-card" href="{{ url_for('list_movies', user_id=u.id) }}">
+          <div class="user-avatar">
+            <span class="user-initial">{{ u.name[:1] | upper }}</span>
+          </div>
+          <div class="user-name">{{ u.name }}</div>
+          <div class="user-stats">
+            <div class="stat-row">
+              <span class="stat-label">Total Movies:</span>
+              <span class="stat-value">{{ u.total }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Watched:</span>
+              <span class="stat-value">{{ u.watched }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Want to watch:</span>
+              <span class="stat-value">{{ u.want }}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Average Rating:</span>
+              <span class="stat-value">
+                {% if u.avg is not none %}{{ "%.1f"|format(u.avg) }}{% else %}—{% endif %}
+              </span>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+
+        <!-- Add New User — always pinned last -->
+        <a class="user-card user-card-add" href="{{ url_for('list_users') }}">
+          <div class="user-avatar user-avatar-add">
+            <span class="user-plus">+</span>
+          </div>
+          <div class="user-name">New Profile</div>
+          <div class="user-stats">
+            <div class="stat-row">
+              <span class="stat-label"></span>
+            </div>
+          </div>
+        </a>
+
       </div>
     </div>
-  </section>
+
+  </div>
+
+</section>
 {% endblock %}

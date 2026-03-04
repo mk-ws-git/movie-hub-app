@@ -104,9 +104,36 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
 
 """ APP ROUTES """
 
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('home.html')
+    users = dm.get_users()
+
+    cards = []
+    for u in users:
+        # minimal stats you can compute with existing schema
+        movies = dm.get_movies(u.id)
+        count_total = len(movies)
+
+        # placeholders for future fields (watched/want/rating)
+        count_watched = 0
+        count_want = 0
+        avg_rating = None
+
+        # if you store imdb_rating only (not "user rating"), you can show OMDb avg:
+        ratings = [m.imdb_rating for m in movies if m.imdb_rating is not None]
+        if ratings:
+            avg_rating = sum(ratings) / len(ratings)
+
+        cards.append({
+            "id": u.id,
+            "name": u.name,
+            "total": count_total,
+            "watched": count_watched,
+            "want": count_want,
+            "avg": avg_rating,
+        })
+
+    return render_template("home.html", user_cards=cards)
 
 @app.route('/users', methods=["GET"])
 def list_users():

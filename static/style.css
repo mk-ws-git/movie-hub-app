@@ -2,117 +2,397 @@
    mov.io Design System
    ========================= */
 :root {
-  --blue: #0000ff;
-  --text: #0b0b12;
-  --muted: rgba(11, 11, 18, 0.65);
-  --border: rgba(11, 11, 18, 0.12);
+    --white: #ffffff;
+    --silver: #c8c8ce;
+    --gray-med: #8e8e96;
+    --gray-dark: #5a5a62;
+    --ink: #1a1a20;
+    --indigo: #0052c9;
+    --blue-med: #5e7ded;
+    --blue-light: #b0d1fb;
+    --accent: #c1ff72
+  }
 
-  --card-bg: rgba(173, 216, 255, 0.25);
-  --card-bg-strong: rgba(173, 216, 255, 0.35);
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  --radius-sm: 12px;
-  --radius-lg: 18px;
+  html { scroll-behavior: smooth; }
 
-  --shadow-sm: 0 6px 18px rgba(0,0,0,0.06);
-  --shadow-md: 0 12px 30px rgba(0,0,0,0.10);
+  /* ─── WORDMARK ─── */
+  .wordmark-wrap {
+    opacity: 0;
+    animation: rise 0.7s 0.25s ease forwards;
+  }
 
-  --gap-1: 10px;
-  --gap-2: 14px;
-  --gap-3: 20px;
+  .wordmark {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(72px, 12vw, 136px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
+  }
 
-  --pad-1: 14px;
-  --pad-2: 20px;
-  --pad-3: 32px;
-}
+  .wordmark .mov { color: var(--ink); }
+  .wordmark .dot { color: var(--indigo); }
+  .wordmark .io  { color: var(--ink); font-weight: 400; }
 
-
-/* Global basics */
+/* =========================================================
+   Base / Layout
+   ========================================================= */
 body {
   margin: 0;
-  font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: var(--text);
+  background: var(--silver);
+  color: var(--ink);
+  font-family: 'Instrument Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 main.container {
-  margin-top: 70px;
-  margin-bottom: 70px;
+  margin-top: var(--section-gap);
+  margin-bottom: var(--section-gap);
 }
 
-/* Typography */
-h1 {
-  margin-top: 70px;
+.container {
+  max-width: var(--container-max);
+}
+
+.section {
+    padding: 100px 80px;
+    border-bottom: 1px solid var(--silver);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 64px;
+  }
+
+  .section-num {
+    font-family: 'DM Sans', monospace;
+    font-size: 11px;
+    color: var(--indigo);
+    letter-spacing: 0.1em;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-dark);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--silver);
+  }
+
+  /* =========================================================
+   Home - mov.io
+   ========================================================= */
+.home-body { margin: 0; }
+.home-main  { padding: 0; }
+
+/* ── Hero ── */
+.home-hero {
+  min-height: 100vh;
+  background-image: url("/static/home-background.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 44px;
+  padding: 60px 24px 80px;
+}
+
+/* film grain over the photo */
+.home-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Logo ── */
+.home-logo-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: homeRise 0.8s 0.1s ease both;
+}
+
+.home-logo {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(100px, 25vw, 180px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  filter:
+    drop-shadow(0 0 48px rgba(77, 142, 247, 0.30))
+    drop-shadow(0 2px 16px rgba(0, 0, 0, 0.70));
+}
+
+.logo-mov { color: #ffffff; }
+.logo-dot { color: var(--indigo); }
+.logo-io  { font-weight: 400; color: var(--silver); }
+
+.home-tagline {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--white);
+  text-align: center;
+  text-transform: lowercase;
+  margin-top: 0px;
+}
+
+.home-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 80%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 30px 30px 34px;
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  box-shadow:
+    0 0 0 1px rgba(77, 142, 247, 0.07),
+    0 28px 72px rgba(0, 0, 0, 0.55);
+  animation: homeRise 0.8s 0.28s ease both;
+}
+
+.user-section-label {
+  display: block;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--silver);
+  margin-bottom: 25px;
+}
+
+.user-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 8px 4px;
+  scroll-snap-type: x mandatory;
+}
+
+.user-grid-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  margin: 0 -4px;
+}
+
+.user-grid::-webkit-scrollbar { display: none; }
+.user-grid-wrap { scrollbar-width: none; }
+
+.user-card {
+  flex: 0 0 calc((100% - 30px) / 4);
+  scroll-snap-align: start;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 14px;
+  padding: 40px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  transition:
+    transform     0.22s cubic-bezier(0.34, 1.56, 0.64, 1),  /* slight spring overshoot */
+    background    0.22s ease,
+    border-color  0.22s ease,
+    box-shadow    0.22s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(77, 142, 247, 0.55);
+  box-shadow:
+    0 16px 48px 12px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(77, 142, 247, 0.25),
+    0 0 32px 12px rgba(77, 142, 247, 0.12);
+}
+
+/* Avatar circle */
+.user-avatar {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: var(--indigo, #0052c9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(77, 142, 247, 0.22);
+}
+
+.user-initial {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 40px;
   font-weight: 800;
-  color: var(--blue);
+  color: #fff;
+  line-height: 1;
 }
 
-/* Top navigation bar */
-.topbar {
-    background-image: url("/static/movio-header.svg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+.user-avatar-add {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px dashed rgba(255, 255, 255, 0.28);
+  box-shadow: none;
+}
 
-    padding: 60px 20px;
+.user-plus {
+  font-size: 40px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1;
+}
+
+/* ── Pin "Add New User" card always last ── */
+.user-card-add {
+  order: 9999;
+  position: sticky;
+  right: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+/* Name */
+.user-name {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+}
+
+/* User stats */
+.user-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+  font-size: 13px;
+}
+
+.stat-label {
+  text-align: left;
+  color: rgba(255, 255, 255, 0.42);
+  font-weight: 400;
+}
+
+.stat-value {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Entrance animation ── */
+@keyframes homeRise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 620px) {
+  .home-hero  { gap: 32px; padding: 48px 16px 60px; }
+  .home-card  { padding: 22px 16px 28px; }
+  .user-grid  { gap: 10px; }
+  .user-card  { flex: 0 0 160px; padding: 16px 14px; }
+}
+
+/* =========================================================
+   Header (Topbar)
+   ========================================================= */
+.topbar {
+  background-image: url("/static/movio-header.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 60px 20px;
 }
 
 .topbar .brand {
-    color: white;
-    text-decoration: none;
-    font-size: 60px;
-    font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+  font-size: 60px;
+  font-weight: 800;
 }
 
-/* Main content container */
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-/* Flash messages */
-.flash-container {
-    margin-bottom: 20px;
-}
-
-.flash {
-    padding: 10px 15px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-}
-
-.flash-success {
-    background-color: #d1fae5;
-    color: #065f46;
-}
-
-.flash-error {
-    background-color: #fee2e2;
-    color: #7f1d1d;
-}
-
-.flash-warning {
-    background-color: #fef3c7;
-    color: #78350f;
-}
-
-/* Global spacing */
-main.container {
-  margin-top: 70px;
-  margin-bottom: 70px;
-}
-
-/* Typography */
+/* =========================================================
+   Typography
+   ========================================================= */
 h1 {
-  margin-top: 70px;
-  font-weight: 700;
-  color: #0000ff;
+  margin-top: 0; /* avoid stacking with cards */
+  font-weight: 800;
+  color: var(--blue);
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
 }
 
-/* Body content container */
-.content-card {
-  max-width: 800px;
-  margin: 70px auto 0 auto;
+h4 {
+  margin-top: 10px;
+  color: rgba(255,255,255,0.9); /* if shown on blue background; adjust as needed */
+  font-weight: 500;
+}
+
+.label {
+    font-family: 'DM Sans', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+/* =========================================================
+   Cards / Containers
+   ========================================================= */
+.content-card,
+.welcome-card {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto 24px auto;
   padding: 40px;
   background: var(--card-bg);
   border-radius: var(--radius-lg);
@@ -125,21 +405,16 @@ h1 {
   border-top: 1px solid var(--border);
 }
 
-/* Two-column header row */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
+/* =========================================================
+   Forms / Inputs
+   ========================================================= */
 input[type="text"],
 input[type="search"],
 input[type="email"],
 input[type="password"],
 textarea,
 select {
-  border-radius: 30px;
+  border-radius: 999px;
   padding: 10px 16px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.85);
@@ -153,11 +428,83 @@ select:focus {
   box-shadow: 0 0 0 4px rgba(0,0,255,0.10);
 }
 
-/* All buttons (including Bootstrap .btn) */
+/* =========================================================
+   Buttons
+   ========================================================= */
 button,
 .btn {
-  border-radius: 30px !important;
+  border-radius: 999px !important;
   text-transform: uppercase;
   font-weight: 700;
+    font-size: 12px;
   letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   Add Movie Section Layout
+   ========================================================= */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.add-movie-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Override input width here */
+.add-movie-inline input {
+  width: 360px;
+  max-width: 100%;
+}
+
+/* If you want ADD button to always be mov.io blue */
+.add-movie-inline .btn {
+  background: var(--blue);
+  border: 1px solid var(--blue);
+  color: #fff;
+}
+
+.add-movie-inline .btn:hover {
+  filter: brightness(0.92);
+}
+
+/* =========================================================
+   Flash Messages
+   ========================================================= */
+.flash-container {
+  margin-bottom: 20px;
+}
+
+.flash {
+  padding: 10px 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.flash-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.flash-error {
+  background-color: #fee2e2;
+  color: #7f1d1d;
+}
+
+.flash-warning {
+  background-color: #fef3c7;
+  color: #78350f;
 }

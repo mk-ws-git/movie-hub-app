@@ -2,44 +2,37 @@
 
 {% block content %}
 
-<h1>welcome back to mov.io, {{ user.name }}.</h1>
+<div class="welcome-card">
+  <h1>welcome back to mov.io, {{ user.name }}.</h1>
+  <h4>organize and explore your favourite movies</h4>
+</div>
 
 <div class="content-card">
-    <h2>organize and explore your favourite movies</h2>
 
-  <div class="section-divider"></div>
-
-  <!-- Header Row -->
   <div class="section-header">
-    <h4 class="m-0">Your movie list:</h4>
 
-    <button type="button"
-            class="btn btn-primary"
-            onclick="document.getElementById('add-movie-form').scrollIntoView({behavior: 'smooth'})">
-      ADD MOVIE
-    </button>
-  </div>
+  <!-- LEFT COLUMN -->
+  <h4 class="m-0">Your movie list:</h4>
 
-  <!-- Add Movie Form -->
-  <form id="add-movie-form"
-        action="{{ url_for('create_movie', user_id=user.id) }}"
+  <!-- RIGHT COLUMN (Add Movie Inline) -->
+  <form action="{{ url_for('create_movie', user_id=user.id) }}"
         method="post"
-        class="mb-4">
+        class="add-movie-inline">
 
-    <div class="d-flex gap-2">
       <input type="text"
              name="title"
-             placeholder="Movie title (e.g., Alien)"
-             class="form-control"
+             placeholder="Enter movie title to add (ie. 'Alien')"
              required>
 
-      <button type="submit" class="btn btn-dark">
+      <button type="submit" class="btn btn-primary">
         ADD
       </button>
-    </div>
   </form>
 
-  <div class="section-divider"></div>
+</div>
+
+<div class="section-divider"></div>
+
 
   <!-- Movie List -->
   <ul class="list-unstyled">
