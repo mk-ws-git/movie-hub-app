@@ -30,25 +30,9 @@
             <span class="user-initial">{{ u.name[:1] | upper }}</span>
           </div>
           <div class="user-name">{{ u.name }}</div>
-          <div class="user-stats">
-            <div class="stat-row">
-              <span class="stat-label">Total Movies:</span>
+          <div class="user-collection">
+              <span class="stat-label">Movies in Collection:<br></span>
               <span class="stat-value">{{ u.total }}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Watched:</span>
-              <span class="stat-value">{{ u.watched }}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Want to watch:</span>
-              <span class="stat-value">{{ u.want }}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Average Rating:</span>
-              <span class="stat-value">
-                {% if u.avg is not none %}{{ "%.1f"|format(u.avg) }}{% else %}—{% endif %}
-              </span>
-            </div>
           </div>
         </a>
         {% endfor %}
@@ -58,12 +42,7 @@
           <div class="user-avatar user-avatar-add">
             <span class="user-plus">+</span>
           </div>
-          <div class="user-name">New Profile</div>
-          <div class="user-stats">
-            <div class="stat-row">
-              <span class="stat-label"></span>
-            </div>
-          </div>
+          <div class="user-name">Add New User</div>
         </a>
 
       </div>
