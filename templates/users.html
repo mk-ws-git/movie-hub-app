@@ -21,11 +21,12 @@
     <!-- ── Left Column ── -->
     <div class="profiles-col-left">
       <div class="profiles-list-card">
-        <h2 class="profiles-list-title">User Profiles</h2>
 
         {% if users %}
-        <div class="profiles-section-label">
-          {{ users|length }} profile{{ 's' if users|length != 1 }}
+
+        <div class="profiles-list-header">
+          <h2 class="profiles-list-title">User Profiles</h2>
+          <span class="profiles-section-label">{{ users|length }} profile{{ 's' if users|length != 1 }}</span>
         </div>
 
         <div class="profiles-user-grid">
