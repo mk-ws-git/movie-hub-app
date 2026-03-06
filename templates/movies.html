@@ -1,85 +1,230 @@
 {% extends "base.html" %}
+{% block title %}{{ user.name }}'s Collection – mov.io{% endblock %}
+
+{% block main_class %}movies-main{% endblock %}
+{% block flash %}{% endblock %}
 
 {% block content %}
 
-<div class="welcome-card">
-  <h1>welcome back to mov.io, {{ user.name }}.</h1>
-  <h4>organize and explore your favourite movies</h4>
-</div>
+{% macro movie_card(movie) %}
+<div class="movie-card">
 
-<div class="content-card">
-
-  <div class="section-header">
-
-  <!-- LEFT COLUMN -->
-  <h4 class="m-0">Your movie list:</h4>
-
-  <!-- RIGHT COLUMN (Add Movie Inline) -->
-  <form action="{{ url_for('create_movie', user_id=user.id) }}"
-        method="post"
-        class="add-movie-inline">
-
-      <input type="text"
-             name="title"
-             placeholder="Enter movie title to add (ie. 'Alien')"
-             required>
-
-      <button type="submit" class="btn btn-primary">
-        ADD
-      </button>
-  </form>
-
-</div>
-
-<div class="section-divider"></div>
-
-
-  <!-- Movie List -->
-  <ul class="list-unstyled">
-    {% for movie in movies %}
-      <li class="mb-4">
-
-        <div class="mb-2">
-          <strong>{{ movie.title }}</strong>
-          {% if movie.year %} ({{ movie.year }}){% endif %}
-          {% if movie.imdb_url %}
-            - <a href="{{ movie.imdb_url }}" target="_blank">IMDb</a>
-          {% endif %}
-        </div>
-
-        <div class="d-flex gap-2 flex-wrap">
-
-          <!-- Update -->
-          <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
-                method="post"
-                class="d-flex gap-2">
-            <input type="text"
-                   name="new_title"
-                   placeholder="New title"
-                   required>
-            <button type="submit" class="btn btn-outline-primary">
-              UPDATE
-            </button>
-          </form>
-
-          <!-- Delete -->
-          <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
-                method="post">
-            <button type="submit" class="btn btn-outline-danger">
-              DELETE
-            </button>
-          </form>
-
-        </div>
-
-      </li>
+  <!-- Poster -->
+  <div class="movie-card-poster">
+    {% if movie.poster_url and movie.poster_url != 'N/A' %}
+      <img src="{{ movie.poster_url }}" alt="{{ movie.title }}">
     {% else %}
-      <li>No movies yet. Add one above.</li>
-    {% endfor %}
-  </ul>
+      <div class="movie-card-placeholder">{{ movie.title[:1]|upper }}</div>
+    {% endif %}
+    {% if movie.imdb_url %}
+      <a href="{{ movie.imdb_url }}" target="_blank" class="movie-card-imdb-badge">IMDb ↗</a>
+    {% endif %}
+  </div>
 
-  <div class="mt-4">
-    <a href="{{ url_for('home') }}">← Back to home</a>
+  <!-- Info -->
+  <div class="movie-card-info">
+    <div class="movie-card-title">{{ movie.title }}</div>
+    <div class="movie-card-meta-row">
+      {% if movie.year %}<span class="movie-card-year">{{ movie.year }}</span>{% endif %}
+      {% if movie.imdb_rating %}
+        <span class="movie-card-rating">
+          <span class="movie-rating-key">IMDb:</span> {{ movie.imdb_rating }}
+        </span>
+      {% endif %}
+    </div>
+    {% if movie.director %}
+      <div class="movie-card-director">dir. {{ movie.director }}</div>
+    {% endif %}
+    {% if movie.genre %}
+      <div class="movie-card-genres">
+        {% for g in movie.genre.split(', ') %}
+          <span class="movie-genre-tag">{{ g }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if movie.plot %}
+      <div class="movie-card-plot">{{ movie.plot }}</div>
+    {% endif %}
+  </div>
+
+  <!-- ── Divider ── -->
+  <div class="movie-card-section-divider"></div>
+
+  <!-- Status buttons -->
+  <div class="movie-card-status">
+
+    <form action="{{ url_for('toggle_want_to_watch', user_id=user.id, movie_id=movie.id) }}"
+          method="POST">
+      <button type="submit"
+              class="movie-status-btn {% if movie.want_to_watch %}movie-status-btn-active-want{% endif %}">
+        {% if movie.want_to_watch %}✓ Want to Watch{% else %}+ Want to Watch{% endif %}
+      </button>
+    </form>
+
+    <form action="{{ url_for('toggle_watched', user_id=user.id, movie_id=movie.id) }}"
+          method="POST">
+      <button type="submit"
+              class="movie-status-btn {% if movie.watched %}movie-status-btn-active-watched{% endif %}">
+        {% if movie.watched %}✓ Watched{% else %}Mark Watched{% endif %}
+      </button>
+    </form>
+
+    {% if movie.watched %}
+    <form action="{{ url_for('rate_movie', user_id=user.id, movie_id=movie.id) }}"
+          method="POST" class="movie-rating-form">
+      <div class="movie-stars">
+        {% for i in range(1, 11) %}
+          <button type="submit" name="rating" value="{{ i }}"
+                  class="movie-star {% if movie.user_rating and movie.user_rating >= i %}movie-star-filled{% endif %}">★</button>
+        {% endfor %}
+      </div>
+      <div class="movie-star-labels">
+        {% for i in range(1, 11) %}
+          <span class="movie-star-label">{{ i }}</span>
+        {% endfor %}
+      </div>
+      {% if movie.user_rating %}
+        <div class="movie-user-rating-display">Your rating: {{ movie.user_rating }}/10</div>
+      {% endif %}
+    </form>
+    {% endif %}
+
+  </div>
+
+  <!-- ── Divider ── -->
+  <div class="movie-card-section-divider"></div>
+
+  <!-- Update / Delete -->
+  <div class="movie-card-actions">
+    <form action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}"
+          method="POST" class="movie-card-update-form">
+      <input type="text" name="new_title" class="movie-card-update-input"
+             placeholder="New title..." required>
+      <button type="submit" class="movie-card-btn movie-card-btn-update">Update</button>
+    </form>
+    <form action="{{ url_for('delete_movie', user_id=user.id, movie_id=movie.id) }}"
+          method="POST"
+          onsubmit="return confirm('Delete {{ movie.title }}?')">
+      <button type="submit" class="movie-card-btn movie-card-btn-delete">Delete</button>
+    </form>
+  </div>
+
+</div>
+{% endmacro %}
+
+
+<div class="movies-page">
+
+  <!-- ── Page header ── -->
+  <div class="movies-title-wrap">
+    <h1 class="movies-title">Welcome back, {{ user.name }}!</h1>
+    <p class="movies-subtitle">Browse and update your movie collection.</p>
+  </div>
+
+  <div class="movies-divider"></div>
+
+  <!-- ── Flash messages ── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Stats row ── -->
+  <div class="movies-stats-row">
+    <div class="movies-stat-card">
+      <span class="movies-stat-num">{{ movies|length }}</span>
+      <span class="movies-stat-label">Total</span>
+    </div>
+    <div class="movies-stat-card">
+      <span class="movies-stat-num">{{ movies|selectattr('watched')|list|length }}</span>
+      <span class="movies-stat-label">Watched</span>
+    </div>
+    <div class="movies-stat-card">
+      <span class="movies-stat-num">{{ movies|selectattr('want_to_watch')|list|length }}</span>
+      <span class="movies-stat-label">Want to Watch</span>
+    </div>
+    <div class="movies-stat-card">
+      {% set rated = movies|selectattr('user_rating')|list %}
+      <span class="movies-stat-num">
+        {% if rated %}{{ (rated|sum(attribute='user_rating') / rated|length)|round(1) }}
+        {% else %}—{% endif %}
+      </span>
+      <span class="movies-stat-label">Avg Rating</span>
+    </div>
+  </div>
+
+  <!-- ── Main collection card ── -->
+  <div class="movies-main-card">
+
+    <div class="movies-main-header">
+      <h2 class="movies-main-title">Your Movie Collection</h2>
+      <form action="{{ url_for('create_movie', user_id=user.id) }}"
+            method="POST" class="movies-add-form">
+        <input type="text" name="title" class="movies-add-input"
+               placeholder="Add a movie title..." required autocomplete="off">
+        <button type="submit" class="movies-add-btn">+ Add Movie</button>
+      </form>
+    </div>
+
+    <div class="movies-inner-divider"></div>
+
+    <!-- ── Want to Watch ── -->
+    {% set want_list = movies|selectattr('want_to_watch')|list %}
+    {% if want_list %}
+    <div class="movies-section">
+      <h3 class="movies-section-title">Want to Watch
+        <span class="movies-section-count">{{ want_list|length }}</span>
+      </h3>
+      <div class="movies-hscroll-wrap">
+        <div class="movies-hscroll">
+          {% for movie in want_list %}{{ movie_card(movie) }}{% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Watched ── -->
+    {% set watched_list = movies|selectattr('watched')|list %}
+    {% if watched_list %}
+    <div class="movies-section">
+      <h3 class="movies-section-title">Watched
+        <span class="movies-section-count">{{ watched_list|length }}</span>
+      </h3>
+      <div class="movies-hscroll-wrap">
+        <div class="movies-hscroll">
+          {% for movie in watched_list %}{{ movie_card(movie) }}{% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── All Movies grid ── -->
+    <div class="movies-section">
+      <h3 class="movies-section-title">All Movies
+        <span class="movies-section-count">{{ movies|length }}</span>
+      </h3>
+      {% if movies %}
+      <div class="movies-all-grid">
+        {% for movie in movies %}{{ movie_card(movie) }}{% endfor %}
+      </div>
+      {% else %}
+      <div class="movies-empty">
+        <p>No movies yet. Add one above to get started.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div><!-- /.movies-main-card -->
+
+  <div class="movies-footer">
+    <a href="{{ url_for('home') }}" class="back-link">
+      <span class="back-arrow">←</span> Back to mov.io
+    </a>
   </div>
 
 </div>

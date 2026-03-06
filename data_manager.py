@@ -42,14 +42,23 @@ class DataManager:
 
     # ── Movies ─────────────────────────────────────────────
 
-    def get_movies(self, user_id: int) -> list[Movie]:
-        """Return all Movie objects in a user's collection."""
-        return (
-            Movie.query
+    def get_movies(self, user_id: int) -> list:
+        rows = (
+            db.session.query(Movie, UserMovie)
             .join(UserMovie, Movie.id == UserMovie.movie_id)
             .filter(UserMovie.user_id == user_id)
             .all()
         )
+
+        movies = []
+
+        for movie, link in rows:
+            movie.watched = link.watched
+            movie.want_to_watch = link.want_to_watch
+            movie.user_rating = link.user_rating
+            movies.append(movie)
+
+        return movies
 
     def get_user_movie(self, user_id: int, movie_id: int) -> UserMovie | None:
         """Return the UserMovie junction row """
@@ -105,7 +114,7 @@ class DataManager:
         return movie
 
 
-    def delete_movie(self, movie_id: int) -> bool:
+    def delete_movie(self, user_id, movie_id: int) -> bool:
         """Remove movie from user's collection.
                 Deletes the shared Movie row only if no other users own it."""
         link = UserMovie.query.filter_by(
@@ -153,3 +162,22 @@ class DataManager:
         link.user_rating = rating
         db.session.commit()
         return True
+
+    def toggle_want_to_watch(self, user_id: int, movie_id: int) -> bool:
+        link = self.get_user_movie(user_id, movie_id)
+        if not link:
+            return False
+        return self.set_want_to_watch(user_id, movie_id, not link.want_to_watch)
+
+    def toggle_watched(self, user_id: int, movie_id: int) -> bool:
+        link = self.get_user_movie(user_id, movie_id)
+        if not link:
+            return False
+
+        if link.watched:
+            self.set_user_rating(user_id, movie_id, None)  # clear rating when un-watching
+        return self.set_watched(user_id, movie_id, not link.watched)
+
+    def rate_movie(self, user_id: int, movie_id: int, rating: int) -> bool:
+        self.set_watched(user_id, movie_id, True)  # auto-mark watched
+        return self.set_user_rating(user_id, movie_id, rating)

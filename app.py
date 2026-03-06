@@ -300,6 +300,69 @@ def delete_movie(user_id, movie_id):
     flash("Movie deleted." if ok else "Movie not found.", "success" if ok else "error")
     return redirect(url_for("list_movies", user_id=user_id))
 
+# Mark as Want to Watch
+@app.route("/users/<int:user_id>/movies/<int:movie_id>/want", methods=["POST"])
+def toggle_want_to_watch(user_id, movie_id):
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("home"))
+
+    try:
+        dm.toggle_want_to_watch(user_id, movie_id)
+    except SQLAlchemyError:
+        db.session.rollback()
+        app.logger.exception("DB error toggling want_to_watch user_id=%s movie_id=%s", user_id, movie_id)
+        flash("Database error.", "error")
+
+    return redirect(url_for("list_movies", user_id=user_id))
+
+
+# Mark as Watched
+@app.route("/users/<int:user_id>/movies/<int:movie_id>/watched", methods=["POST"])
+def toggle_watched(user_id, movie_id):
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("home"))
+
+    try:
+        dm.toggle_watched(user_id, movie_id)
+    except SQLAlchemyError:
+        db.session.rollback()
+        app.logger.exception("DB error toggling watched user_id=%s movie_id=%s", user_id, movie_id)
+        flash("Database error.", "error")
+
+    return redirect(url_for("list_movies", user_id=user_id))
+
+
+# Rate Movie
+@app.route("/users/<int:user_id>/movies/<int:movie_id>/rate", methods=["POST"])
+def rate_movie(user_id, movie_id):
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found.", "error")
+        return redirect(url_for("home"))
+
+    rating_str = request.form.get("rating", "").strip()
+    if not rating_str or not rating_str.isdigit():
+        flash("Invalid rating.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
+    rating = int(rating_str)
+    if not 1 <= rating <= 10:
+        flash("Rating must be between 1 and 10.", "error")
+        return redirect(url_for("list_movies", user_id=user_id))
+
+    try:
+        dm.rate_movie(user_id, movie_id, rating)
+    except SQLAlchemyError:
+        db.session.rollback()
+        app.logger.exception("DB error rating movie user_id=%s movie_id=%s", user_id, movie_id)
+        flash("Database error.", "error")
+
+    return redirect(url_for("list_movies", user_id=user_id))
+
 
 # 404 handling
 @app.errorhandler(404)
