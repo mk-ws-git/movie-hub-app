@@ -31,6 +31,7 @@ body {
   background: var(--silver);
   color: var(--ink);
   font-family: 'Instrument Sans', sans-serif;
+  font-size: 12px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -78,9 +79,9 @@ main.container {
 
 .home-logo {
   font-family: 'Instrument Sans', sans-serif;
-  font-size: clamp(56px, 7vw, 96px);
+  font-size: clamp(80px, 14vw, 120px);
   font-weight: 700;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.025em;
   line-height: 1;
   filter:
     drop-shadow(0 0 48px rgba(77, 142, 247, 0.30))
@@ -94,7 +95,7 @@ main.container {
 .home-tagline {
   font-family: 'Instrument Sans', sans-serif;
   font-style: italic;
-  font-size: 15px;
+  font-size: 18px;
   color: var(--silver);
   letter-spacing: 0.01;
   text-transform: none;
@@ -104,6 +105,7 @@ main.container {
 }
 
 .home-card {
+  overflow: hidden;
   position: relative;
   z-index: 1;
   width: 100%;
@@ -122,37 +124,43 @@ main.container {
 .user-section-label {
   display: block;
   font-family: 'Instrument Sans', sans-serif;
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--silver);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+.user-grid-outer {
+    display: flex;
+    gap: 12px;
+    width: 100%;
 }
 
 .user-grid-wrap {
+  flex: 1;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: visible;
-  margin: 0 -20px;
-  padding: 20px;
   scrollbar-width: none;
-  position: relative;
-  z-index: 1;
+  padding: 10px 4px;
 }
 
 .user-grid-wrap::-webkit-scrollbar { display: none; }
+
 
 .user-grid {
   display: flex;
   flex-wrap: nowrap;
   gap: 12px;
-  padding: 10px 4px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
 
 .user-card {
-  flex: 0 0 calc((100% - 30px) / 4);
+  flex: 0 0 220px;
+  min-width: 220px;
   scroll-snap-align: start;
   align-items: center;
   text-align: center;
@@ -220,9 +228,15 @@ main.container {
 
 /* ── Pin "Add New User" card always last ── */
 .user-card-add {
-  order: 9999;
-  position: sticky;
-  right: 0;
+  flex: 0 0 220px;
+  min-width: 220px;
+  width: 220px;
+  align-self: stretch;
+  position: static;
+  top: unset;
+  right: unset;
+  height: unset;
+  order: unset;
   flex-shrink: 0;
   background: transparent;
   border: 1.5px dashed rgba(255, 255, 255, 0.18);
@@ -450,6 +464,368 @@ button,
   font-weight: 700;
     font-size: 12px;
   letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   Manage Profiles Page
+   ========================================================= */
+.profiles-page {
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Page title ── */
+.profiles-header {
+  margin-bottom: 15px;
+}
+
+.profiles-title {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--indigo);
+}
+
+.profiles-subtitle {
+  font-size: 17.5px;
+  color: var(--ink);
+  margin-bottom: 15px;
+}
+
+/* ── Add card ── */
+.profiles-add-card {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.profiles-add-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profiles-add-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--indigo);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profiles-add-title {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.profiles-add-sub {
+  font-size: 14px;
+  color: var(--gray-med);
+  margin-bottom: 15px;
+}
+
+.profiles-add-form {
+  display: flex;
+  gap: 10px;
+}
+
+.profiles-add-input {
+  flex: 1;
+  border-radius: 10px !important;
+  padding: 11px 16px;
+  border: 1px solid rgba(0,0,0,0.12) !important;
+  background: var(--silver) !important;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.profiles-add-input:focus {
+  border-color: rgba(0,82,201,0.4) !important;
+  box-shadow: 0 0 0 3px rgba(0,82,201,0.10) !important;
+}
+
+.profiles-add-input::placeholder { color: var(--gray-med); }
+
+.profiles-add-btn {
+  background: var(--indigo);
+  color: #fff;
+  border: none;
+  border-radius: 10px !important;
+  padding: 11px 22px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.profiles-add-btn:hover {
+  background: #1a6aff;
+  transform: translateY(-1px);
+}
+
+/* ── User profiles container card ── */
+.profiles-list-card {
+  background: var(--white);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 15px;
+}
+
+.profiles-list-title {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+}
+
+.profiles-section-label {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gray-med);
+  margin-bottom: 20px;
+}
+
+.profiles-user-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ── Individual tile ── */
+.profile-tile {
+  flex: 0 0 calc((100% - 36px) / 4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 14px;
+  padding: 28px 16px 20px;
+  gap: 10px;
+  transition:
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.profile-tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0,82,201,0.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,82,201,0.10);
+}
+
+/* Avatar */
+.profile-tile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255,255,255,0.8);
+  box-shadow: 0 0 0 2px rgba(0,82,201,0.15);
+}
+
+.profile-tile-initial {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+/* Name */
+.profile-tile-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.profile-tile-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.profile-tile-count-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.profile-tile-count-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-med);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Action buttons */
+.profile-tile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  padding-top: 12px;
+  margin-top: 2px;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px !important;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  width: 100%;
+}
+
+.profile-btn-view {
+  background: var(--indigo);
+  color: #fff;
+}
+
+.profile-btn-view:hover {
+  background: #1a6aff;
+  box-shadow: 0 4px 12px rgba(0,82,201,0.25);
+}
+
+.profile-btn-delete {
+  background: transparent;
+  color: var(--gray-dark);
+  border: 1px solid rgba(0,0,0,0.10) !important;
+}
+
+.profile-btn-delete:hover {
+  background: #fee2e2;
+  border-color: #fca5a5 !important;
+  color: #b91c1c;
+}
+
+.profile-delete-form {
+  margin: 0;
+  width: 100%;
+}
+
+/* ── Empty state ── */
+.profiles-empty {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--gray-med);
+  font-size: 15px;
+  border: 1px dashed rgba(0,0,0,0.10);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Footer / back link ── */
+.profiles-footer {
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0,0,0,0.07);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--indigo);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.back-link:hover { opacity: 0.7; }
+.back-arrow { font-size: 14px; }
+
+/* ── Responsive ── */
+@media (max-width: 820px) {
+  .profiles-user-grid { gap: 10px; }
+  .profile-tile { flex: 0 0 calc((100% - 10px) / 2); }
+}
+
+@media (max-width: 480px) {
+  .profiles-add-form { flex-direction: column; }
+  .profile-tile { flex: 0 0 100%; }
+}
+
+.profiles-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+  margin-bottom: 32px;
+}
+
+/* ── Two-column layout ── */
+.profiles-columns {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Right column ── */
+.profiles-col-right .profiles-add-card {
+  position: sticky;
+  top: 24px;
+}
+
+/* ── Responsive: stack on smaller screens ── */
+@media (max-width: 768px) {
+  .profiles-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .profiles-col-right {
+    order: -1;
+  }
+
+  .profiles-col-right .profiles-add-card {
+    position: static;
+  }
 }
 
 /* =========================================================

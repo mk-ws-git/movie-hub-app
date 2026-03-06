@@ -12,7 +12,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev")
 
 # Log errors and exceptions
-# Create logs/ directory if needed
 os.makedirs("logs", exist_ok=True)
 
 file_handler = RotatingFileHandler(
@@ -63,10 +62,8 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
         app.logger.info("OMDb not found title=%r error=%r", title, data.get("Error"))
         return None
 
-    # Parse movie data and create Movie instance
     year_str = (data.get("Year") or "").strip()
 
-    # OMDb sometimes returns "1997" or "1997–" (series), so extract the first 4 digits
     year = 0
     if len(year_str) >= 4 and year_str[:4].isdigit():
         year = int(year_str[:4])
@@ -95,7 +92,6 @@ def fetch_movie_from_omdb(title: str) -> Movie | None:
         poster_url=data.get("Poster", ""),
         imdb_url=imdb_url,
         imdb_id=imdb_id,
-        user_id=0
     )
 
     app.logger.info("OMDb fetched title=%r imdb_id=%s", data.get("Title"), imdb_id)
@@ -110,19 +106,11 @@ def home():
 
     cards = []
     for u in users:
-        # minimal stats you can compute with existing schema
         movies = dm.get_movies(u.id)
         count_total = len(movies)
-
-        # placeholders for future fields (watched/want/rating)
         count_watched = 0
         count_want = 0
         avg_rating = None
-
-        # if you store imdb_rating only (not "user rating"), you can show OMDb avg:
-        ratings = [m.imdb_rating for m in movies if m.imdb_rating is not None]
-        if ratings:
-            avg_rating = sum(ratings) / len(ratings)
 
         cards.append({
             "id": u.id,
@@ -138,7 +126,16 @@ def home():
 @app.route('/users', methods=["GET"])
 def list_users():
     users = dm.get_users()
-    return render_template("users.html", users=users)
+    profiles = []
+    for u in users:
+        movies = dm.get_movies(u.id)
+        profiles.append({
+            "id": u.id,
+            "name": u.name,
+            "total": len(movies),
+        })
+    app.logger.info("Profiles page loaded count=%s", len(users))
+    return render_template("users.html", users=profiles)
 
 # Create a user
 @app.route("/users", methods=["POST"])
@@ -148,17 +145,42 @@ def create_user():
     if not name:
         app.logger.info("Create user failed: empty name")
         flash("User name is required.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("list_users"))
 
     if dm.user_exists(name):
         app.logger.info("Create user failed: duplicate name=%r", name)
-        flash("That user name already exists. Enter another user name.", "error")
-        return redirect(url_for("index"))
+        flash(f"A profile named '{name}' already exists.", "error")
+        return redirect(url_for("list_users"))
 
     dm.create_user(name)
     app.logger.info("User created name=%r", name)
     flash(f"User '{name}' created.", "success")
-    return redirect(url_for("index"))
+    return redirect(url_for("list_users"))
+
+
+# Delete user (and their movies - cascade)
+@app.route("/users/<int:user_id>/delete", methods=["POST"])
+def delete_user(user_id):
+    user = User.query.get(user_id)
+
+    if not user:
+        app.logger.info("Delete profile failed: not found user_id=%s", user_id)
+        flash("DELETE:Profile not found.", "error")
+        return redirect(url_for("list_users"))
+
+    name = user.name
+
+    try:
+        dm.delete_user(user_id)
+    except SQLAlchemyError:
+        db.session.rollback()
+        app.logger.exception("DB error deleting profile user_id=%s", user_id)
+        flash("DELETE:Database error while deleting profile.", "error")
+        return redirect(url_for("list_users"))
+
+    app.logger.info("Profile deleted user_id=%s name=%r", user_id, name)
+    flash(f"DELETE:Profile '{name}' deleted.", "success")
+    return redirect(url_for("list_users"))
 
 
 # List movies for a user
@@ -168,7 +190,7 @@ def list_movies(user_id):
     if not user:
         app.logger.info("List movies: user not found user_id=%s", user_id)
         flash("User not found.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
     movies = dm.get_movies(user_id)
     return render_template("movies.html", user=user, movies=movies)
@@ -181,7 +203,7 @@ def create_movie(user_id):
     if not user:
         app.logger.info("Add movie failed: user not found user_id=%s", user_id)
         flash("User not found.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
     title = request.form.get("title", "").strip()
     if not title:
@@ -201,10 +223,9 @@ def create_movie(user_id):
         flash("That movie is already in this user’s list.", "warning")
         return redirect(url_for("list_movies", user_id=user_id))
 
-    movie.user_id = user_id
-
     try:
-        dm.add_movie(movie)
+        dm.add_movie(movie, user_id)
+
     except SQLAlchemyError:
         db.session.rollback()
         app.logger.exception("DB error adding movie user_id=%s title=%r imdb_id=%s", user_id, title, movie.imdb_id)
@@ -224,7 +245,7 @@ def update_movie(user_id, movie_id):
     if not user:
         app.logger.info("Update movie failed: user not found user_id=%s movie_id=%s", user_id, movie_id)
         flash("User not found.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
     new_title = request.form.get("new_title", "").strip()
     if not new_title:
@@ -259,7 +280,7 @@ def delete_movie(user_id, movie_id):
     if not user:
         app.logger.info("Delete movie failed: user not found user_id=%s movie_id=%s", user_id, movie_id)
         flash("User not found.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
     movie = dm.get_movie_for_user(user_id, movie_id)
     if not movie:
@@ -268,7 +289,7 @@ def delete_movie(user_id, movie_id):
         return redirect(url_for("list_movies", user_id=user_id))
 
     try:
-        ok = dm.delete_movie(movie_id)
+        ok = dm.delete_movie(user_id, movie_id)
     except SQLAlchemyError:
         db.session.rollback()
         app.logger.exception("DB error deleting movie user_id=%s movie_id=%s", user_id, movie_id)

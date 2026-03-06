@@ -18,13 +18,14 @@
     <div class="topbar-inner">
       <a href="{{ url_for('home') }}" class="brand">mov.io</a>
       <nav class="nav">
-        <a href="{{ url_for('list_users') }}" class="nav-link">Users</a>
+
       </nav>
     </div>
   </header>
   {% endblock %}
 
-  <main class="{% block main_class %}container{% endblock %}">
+  <main class="{% block main_class %}{% endblock %}">
+  {% block flash %}
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="flash-container">
@@ -34,9 +35,10 @@
         </div>
       {% endif %}
     {% endwith %}
+  {% endblock %}
 
-    {% block content %}{% endblock %}
-  </main>
+  {% block content %}{% endblock %}
+</main>
 
 </body>
 </html>

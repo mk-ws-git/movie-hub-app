@@ -21,31 +21,34 @@
   <div class="home-card">
     <span class="user-section-label">Who's watching?</span>
 
-    <div class="user-grid-wrap">
-      <div class="user-grid">
+    <div class="user-grid-outer">
+      <div class="user-grid-wrap">
+        <div class="user-grid">
 
-        {% for u in user_cards %}
-        <a class="user-card" href="{{ url_for('list_movies', user_id=u.id) }}">
-          <div class="user-avatar">
-            <span class="user-initial">{{ u.name[:1] | upper }}</span>
-          </div>
-          <div class="user-name">{{ u.name }}</div>
-          <div class="user-collection">
+          {% for u in user_cards %}
+          <a class="user-card" href="{{ url_for('list_movies', user_id=u.id) }}">
+            <div class="user-avatar">
+              <span class="user-initial">{{ u.name[:1] | upper }}</span>
+            </div>
+            <div class="user-name">{{ u.name }}</div>
+            <div class="user-collection">
               <span class="stat-label">Movies in Collection:<br></span>
               <span class="stat-value">{{ u.total }}</span>
-          </div>
-        </a>
-        {% endfor %}
+            </div>
+          </a>
+          {% endfor %}
 
-        <!-- Add New User — always pinned last -->
-        <a class="user-card user-card-add" href="{{ url_for('list_users') }}">
-          <div class="user-avatar user-avatar-add">
-            <span class="user-plus">+</span>
-          </div>
-          <div class="user-name">Add New User</div>
-        </a>
-
+        </div>
       </div>
+
+      <!-- Add New User -->
+      <a class="user-card user-card-add" href="{{ url_for('list_users') }}">
+        <div class="user-avatar user-avatar-add">
+          <span class="user-plus">+</span>
+        </div>
+        <div class="user-name">New Profile</div>
+      </a>
+
     </div>
 
   </div>

@@ -1,42 +1,136 @@
 {% extends "base.html" %}
 {% block title %}Users – mov.io{% endblock %}
 
+{% block flash %}{% endblock %}
+
 {% block content %}
 
-<h1 class="mb-4">Users</h1>
+<div class="profiles-page">
 
-<!-- Users List -->
-<ul class="list-group mb-5">
-  {% for user in users %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      {{ user.name }}
-      <a href="{{ url_for('list_movies', user_id=user.id) }}" class="btn btn-sm btn-primary">
-        SELECT PROFILE
-      </a>
-    </li>
-  {% endfor %}
-</ul>
+  <!-- ── Page header ── -->
+  <div class="profiles-title-wrap">
+    <h1 class="profiles-title">Manage Users</h1>
+    <p class="profiles-subtitle">Add, view or remove user profiles</p>
+  </div>
 
+  <div class="profiles-divider"></div>
 
-<!-- Create User Section -->
-<div id="create-user" class="card p-4 shadow-sm">
-  <h2 class="mb-3">Create a New User</h2>
+  <!-- ── Two-column layout ── -->
+  <div class="profiles-columns">
 
-  <form action="{{ url_for('create_user') }}" method="post">
-    <div class="mb-3">
-      <input
-        type="text"
-        name="name"
-        class="form-control"
-        placeholder="Enter user name"
-        required
-      >
+    <!-- ── Left Column ── -->
+    <div class="profiles-col-left">
+      <div class="profiles-list-card">
+        <h2 class="profiles-list-title">User Profiles</h2>
+
+        {% if users %}
+        <div class="profiles-section-label">
+          {{ users|length }} profile{{ 's' if users|length != 1 }}
+        </div>
+
+        <div class="profiles-user-grid">
+          {% for user in users %}
+          <div class="profile-tile">
+
+            <div class="profile-tile-avatar">
+              <span class="profile-tile-initial">{{ user.name[:1] | upper }}</span>
+            </div>
+
+            <div class="profile-tile-name">{{ user.name }}</div>
+
+            <div class="profile-tile-count">
+              <span class="profile-tile-count-num">{{ user.total }}</span>
+              <span class="profile-tile-count-label">Movies in Collection</span>
+            </div>
+
+            <div class="profile-tile-actions">
+              <a href="{{ url_for('list_movies', user_id=user.id) }}"
+                 class="profile-btn profile-btn-view">
+                View Collection
+              </a>
+              <form action="{{ url_for('delete_user', user_id=user.id) }}"
+                    method="POST"
+                    class="profile-delete-form"
+                    onsubmit="return confirm('Delete {{ user.name }}? This cannot be undone.')">
+                <button type="submit" class="profile-btn profile-btn-delete">
+                  Delete User
+                </button>
+              </form>
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- DELETE flash messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="flash-container" style="margin-top: 16px;">
+                {% for category, message in messages %}
+                  {% if message.startswith('DELETE:') %}
+                    <div class="flash flash-{{ category }}">
+                      {{ message[7:] }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+        {% else %}
+        <div class="profiles-empty">
+          <p>No profiles yet. Create one on the right to get started.</p>
+        </div>
+        {% endif %}
+      </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">
-      Create User
-    </button>
-  </form>
+    <!-- ── Right Column ── -->
+    <div class="profiles-col-right">
+      <div class="profiles-add-card">
+        <div class="profiles-add-header">
+          <span class="profiles-add-icon">+</span>
+          <h2 class="profiles-add-title">Add New User</h2>
+        </div>
+        <div class="profiles-add-sub">Create a new user profile to start building a movie collection.</div>
+
+        <form action="{{ url_for('create_user') }}" method="POST" class="profiles-add-form">
+          <input
+            type="text"
+            name="name"
+            class="profiles-add-input"
+            placeholder="Enter new user name"
+            required
+            autocomplete="off"
+          >
+          <button type="submit" class="profiles-add-btn">Add New User</button>
+        </form>
+
+        <!-- ── Flash messages ── -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if not message.startswith('DELETE:') %}
+                <div class="flash flash-{{ category }}" style="margin-top:16px;">
+                  {{ message }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Back link ── -->
+  <div class="profiles-footer">
+    <a href="{{ url_for('home') }}" class="back-link">
+      <span class="back-arrow">←</span> Back to mov.io
+    </a>
+  </div>
+
 </div>
 
 {% endblock %}
